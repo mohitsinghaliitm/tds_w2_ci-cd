@@ -1,12 +1,12 @@
-name: Daily Commit
+name: Daily Random Commits
 
 on:
   schedule:
     - cron: '30 2 * * *'  # Runs daily at 02:30 UTC
-  workflow_dispatch:  # Allows manual triggering
+  workflow_dispatch:
 
 permissions:
-  contents: write  # Ensure GitHub Actions can push changes
+  contents: write
 
 jobs:
   commit:
@@ -15,17 +15,23 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
-      - name: Configure Git (22f2000429@ds.study.iitm.ac.in)
+      - name: Configure Git
         run: |
           git config --global user.name "GitHub Action"
           git config --global user.email "22f2000429@ds.study.iitm.ac.in"
 
-      - name: Make a Change
+      - name: Make Random Commits (1–10)
         run: |
-          echo "Last run: $(date)" > last_run.txt  # Always modify the file
+          COUNT=$(( (RANDOM % 10) + 1 ))
+          echo "Making $COUNT commits today"
 
-      - name: Commit and Push Changes
+          for i in $(seq 1 $COUNT)
+          do
+            echo "Commit $i at $(date)" >> last_run.txt
+            git add last_run.txt
+            git commit -m "Automated random commit $i at $(date)"
+          done
+
+      - name: Push Changes
         run: |
-          git add last_run.txt
-          git commit -m "Automated daily commit at $(date)" || echo "No changes to commit"
           git push
